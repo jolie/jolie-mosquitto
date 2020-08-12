@@ -1,0 +1,40 @@
+<html>
+	<head>
+		<link href="cssChat.css" rel="stylesheet" type="text/css">
+		<script type="text/javascript" src="jquery-1.10.2.js"></script>
+		<script>
+			function callJolie(operation, request, callback) {
+				$.ajax({
+					url: '/' + operation,
+					dataType: 'json',
+					data: JSON.stringify(request),
+					type: 'POST',
+					contentType: 'application/json',
+					success: function (data) {
+						callback(data);
+					}
+					,
+					error: function (errorType, textStatus, errorThrown) {
+						alert(errorThrown);
+					}
+				});
+			};
+
+			function setUsername() {
+				var request = { "username": $("#nickname").val() }
+				callJolie("setUsername", request, function(data) { });
+				window.location.href = "chat.html";
+			}
+		</script>
+	</head>
+	
+	<body>
+		<div id="div">
+			<h1 id="title">JOLIE CHAT using MOSQUITTO</h1>
+		</div>
+		<div id="divNickname">
+			<input id="nickname" type="text" placeholder="insert your nickname" size="40" maxlength="200" />
+			<button onclick="setUsername()">Go to Chat</button>
+		</div>
+	</body>
+</html>

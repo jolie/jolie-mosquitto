@@ -1,0 +1,115 @@
+body {
+    background-color: #0b634dff;
+    background-image: url("sfondoChat.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    position: relative;
+}
+
+div {
+    width: 100%;
+    text-align: center;
+    margin: 10px 10px 10px 10px;
+}
+
+#divNickname {
+    width: 100%;
+    text-align: center;
+    margin: 200px 10px 10px 10px;
+}
+
+#title {
+    color: #d19b00ff;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 40px;
+    font-weight: bold;
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
+#textChat {
+    height: 350px;
+    width: 800px;
+    margin: auto;
+    padding: 5px 5px 5px 5px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    border: solid 1px #d19b00ff;
+    color: #d19b00ff;
+    background-color: #0a724fff;
+    resize: none;
+    line-height: 200%;
+    overflow: auto;
+}
+
+#divMyMessage {
+    margin-left: auto;
+    margin-right: 10px;
+    text-align: left;
+    display: table;
+    width: auto;
+    padding: 5px 20px 5px 20px;
+    max-width: 500px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    border-radius: 15px;
+    color: #d19b00ff;
+    background-color: rgba(209, 153, 0, 0.25);
+}
+
+#divOtherMessage {
+    margin-left: 10px;
+    margin-right: auto;
+    text-align: left;
+    display: table;
+    width: auto;
+    padding: 5px 20px 5px 20px;
+    max-width: 500px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    border-radius: 15px;
+    color: #d19b00ff;
+    background-color: #0b634dff;
+}
+
+#mex {
+    padding: 3px 3px 3px 10px;
+    margin-right: 10px; 
+    margin-top: 25px;
+    border:solid 1px #d19b00ff; 
+    color: #d19b00ff; 
+    background-color: #0a724fff;
+}
+
+#nickname {
+    padding: 3px 3px 3px 10px;
+    margin-right: 10px; 
+    border:solid 1px #d19b00ff; 
+    color: #d19b00ff; 
+    background-color: #0a724fff;
+}
+
+button {
+    padding: 5px 15px; 
+    color: #0b634dff; 
+    border:solid 1px #d19b00ff;
+    background-color: #d19b00ff; 
+    text-align: center; 
+    font-weight: bold; 
+    border-radius: 12px;
+}
+
+button:hover {
+    background: #0b634dff;
+    color: #d19b00ff;
+}
+    
+button:active {
+    position: relative;
+    top: 1px;
+}
+
+::placeholder {
+    color: rgba(209, 153, 0, 0.7);
+}
