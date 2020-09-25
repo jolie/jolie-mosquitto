@@ -35,17 +35,24 @@ type MosquittoMessageRequest: void {
     message: string
 }
 
+type MosquittoRequest: void {
+    topic: string
+    message: string 
+    session_token?: string
+    client_token?: string
+}
+
 interface MosquittoPublisherInterface {
     RequestResponse: 
-        sendMessage (MosquittoMessageRequest)(void)
+        sendMessage (MosquittoRequest)(void)
 }
 
 interface MosquittoInterface {
     RequestResponse:
-        setMosquitto (SetMosquittoRequest)(void),
+        setMosquitto (SetMosquittoRequest)(void)
 }
 
 interface MosquittoReceiverInteface {
     OneWay: 
-        receive (MosquittoMessageRequest)
+        receive (MosquittoRequest)
 }

@@ -38,7 +38,7 @@ init {
     request << {
         brokerURL = "tcp://mqtt.eclipse.org:1883",
         subscribe << {
-            topic = "jolie/#"
+            topic = "jolie/test"
         }
         // I can set all the options available from the Paho library
         options << {

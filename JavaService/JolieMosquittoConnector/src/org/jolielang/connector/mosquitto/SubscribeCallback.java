@@ -43,10 +43,21 @@ public class SubscribeCallback implements MqttCallback {
 
 	@Override
 	public void messageArrived(String topic, MqttMessage message) throws Exception {
-            // what happens when a message arrives --> in this case simply I print it
             Value request = Value.create();
             request.getNewChild("topic").setValue(topic);
             request.getNewChild("message").setValue(message.toString());
+            
+            String[] tokens = topic.split("/");
+            
+            if (tokens[0].equals("mqttTransform4Jolie")) {
+                if (tokens[tokens.length - 1].equals("response")) {
+                    request.getNewChild("session_token").setValue(tokens[tokens.length - 2]);
+                    request.getNewChild("client_token").setValue(tokens[tokens.length - 4]);
+                } else {
+                    request.getNewChild("session_token").setValue(tokens[tokens.length - 1]);
+                    request.getNewChild("client_token").setValue(tokens[tokens.length - 3]);
+                }
+            }
             javaService.sendMessage(CommMessage.createRequest("receive", "/", request));
 	}
 

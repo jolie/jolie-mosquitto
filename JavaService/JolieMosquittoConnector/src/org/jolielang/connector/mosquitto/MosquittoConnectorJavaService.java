@@ -38,28 +38,66 @@ public class MosquittoConnectorJavaService extends JavaService {
             clientId = MqttClient.generateClientId();
         }
         try {
-            this.client = new MqttClient(brokerURL, clientId, new MqttDefaultFilePersistence("/tmp"));
+            this.client = new MqttClient(brokerURL, clientId, new MqttDefaultFilePersistence("/tmp"));            
+            
             MqttConnectOptions options = new MqttConnectOptions();
             
-            // MqttConnectOptions
+            // implementazione delle opzioni MqttConnectOptions
+            if (request.getFirstChild("options").getFirstChild("debug").boolValue()) {
+                System.out.println("================================================================================");
+            }
             if (request.hasChildren("options")) {
                 Value op = request.getFirstChild("options");
-                
-                if (op.hasChildren("setAutomaticReconnect"))
+                if (op.hasChildren("setAutomaticReconnect")) {
                     options.setAutomaticReconnect(op.getFirstChild("setAutomaticReconnect").boolValue());
-                
-                if (op.hasChildren("setCleanSession"))
+                    if (op.getFirstChild("debug").boolValue()) {
+                        System.out.println("setAutomaticReconnect     correctly set   |   Value : "+op.getFirstChild("setAutomaticReconnect").boolValue());
+                    }
+                } else {
+                    if (op.getFirstChild("debug").boolValue()) {
+                        System.out.println("setAutomaticReconnect        default      |   Value : "+options.isAutomaticReconnect());
+                    }
+                }
+                if (op.hasChildren("setCleanSession")) {
                     options.setCleanSession(op.getFirstChild("setCleanSession").boolValue());
-                    
-                if (op.hasChildren("setConnectionTimeout"))
+                    if (op.getFirstChild("debug").boolValue()) {
+                        System.out.println("setCleanSession           correctly set   |   Value : "+op.getFirstChild("setCleanSession").boolValue());
+                    }
+                } else {
+                    if (op.getFirstChild("debug").boolValue()) {
+                        System.out.println("setCleanSession              default      |   Value : "+options.isCleanSession());
+                    }
+                }
+                if (op.hasChildren("setConnectionTimeout")) {
                     options.setConnectionTimeout(op.getFirstChild("setConnectionTimeout").intValue());
-                    
-                if (op.hasChildren("setKeepAliveInterval"))
+                    if (op.getFirstChild("debug").boolValue()) {
+                        System.out.println("setConnectionTimeout      correctly set   |   Value : "+op.getFirstChild("setConnectionTimeout").intValue());
+                    }
+                } else {
+                    if (op.getFirstChild("debug").boolValue()) {
+                        System.out.println("setConnectionTimeout         default      |   Value : "+options.getConnectionTimeout());
+                    }
+                }
+                if (op.hasChildren("setKeepAliveInterval")) {
                     options.setKeepAliveInterval(op.getFirstChild("setKeepAliveInterval").intValue());
-                
-                if (op.hasChildren("setMaxInflight")) 
+                    if (op.getFirstChild("debug").boolValue()) {
+                        System.out.println("setKeepAliveInterval      correctly set   |   Value : "+op.getFirstChild("setKeepAliveInterval").intValue());
+                    }
+                } else {
+                    if (op.getFirstChild("debug").boolValue()) {
+                        System.out.println("setKeepAliveInterval         default      |   Value : "+options.getKeepAliveInterval());
+                    }
+                }
+                if (op.hasChildren("setMaxInflight")) {
                     options.setMaxInflight(op.getFirstChild("setMaxInflight").intValue());
-                
+                    if (op.getFirstChild("debug").boolValue()) {
+                        System.out.println("setMaxInflight            correctly set   |   Value : "+op.getFirstChild("setMaxInflight").intValue());
+                    }
+                } else {
+                    if (op.getFirstChild("debug").boolValue()) {
+                        System.out.println("setMaxInflight               default      |   Value : "+options.getMaxInflight());
+                    }
+                }
                 if (op.hasChildren("setServerURIs")) {
                     String[] serverURIs = new String[op.getChildren("setServerURIs").size()];
                     for (int i=0; i<op.getChildren("setServerURIs").size(); i++) {
@@ -70,13 +108,26 @@ public class MosquittoConnectorJavaService extends JavaService {
                     }
                     options.setServerURIs(serverURIs);
                 }
-                
-                if (op.hasChildren("setUserName")) 
+                if (op.hasChildren("setUserName")) {
                     options.setUserName(op.getFirstChild("setUserName").strValue());
-                
-                if (op.hasChildren("setPassword")) 
-                    options.setPassword(op.getFirstChild("setPassword").strValue().toCharArray());
-                
+                    if (op.getFirstChild("debug").boolValue()) {
+                        System.out.println("setUserName               correctly set   |   Value : "+op.getFirstChild("setUserName").strValue());
+                    }
+                } else {
+                    if (op.getFirstChild("debug").boolValue()) {
+                        System.out.println("setUserName                  default      |   Value : "+options.getUserName());
+                    }
+                }
+                if (op.hasChildren("setPassword")) {
+                    options.setPassword(op.getFirstChild("setPasswrd").strValue().toCharArray());
+                    if (op.getFirstChild("debug").boolValue()) {
+                        System.out.println("setPassword               correctly set   |   Value : "+op.getFirstChild("setPassword").strValue());
+                    }
+                } else {
+                    if (op.getFirstChild("debug").boolValue()) {
+                        System.out.println("setPassword                  default      |   Value : "+options.getPassword());
+                    }
+                }
                 if (op.hasChildren("setWill")) {
                     Value setWill = op.getFirstChild("setWill");
                     String topic = setWill.getFirstChild("topicWill").strValue();
@@ -84,121 +135,22 @@ public class MosquittoConnectorJavaService extends JavaService {
                     int qos = setWill.getFirstChild("qos").intValue();
                     boolean retained = setWill.getFirstChild("retained").boolValue();
                     options.setWill(client.getTopic(topic), payload.getBytes(), qos, retained);
-                }
-                
-                if (op.hasChildren("setSocketFactory")) {
-                    Value socketFactory = op.getFirstChild("setSocketFactory");
-                    String caCrtFile = socketFactory.getFirstChild("caCrtFile").strValue();
-                    String crtFile = socketFactory.getFirstChild("crtFile").strValue();
-                    String keyFile = socketFactory.getFirstChild("keyFile").strValue();
-                    String password = socketFactory.getFirstChild("password").strValue();
-                    options.setSocketFactory (SslUtil.getSocketFactory(caCrtFile, crtFile, keyFile, password));
-                }
-                
-                if (op.getFirstChild("debug").boolValue()) {
-                    System.out.println("=========================================================================================================");
-                    System.out.println("                                CONNECTION OPTIONS                               ");
-                    System.out.println("=========================================================================================================");
-                    
-                    if (op.hasChildren("setAutomaticReconnect")) {
-                        if (op.getFirstChild("debug").boolValue())
-                            System.out.println("setAutomaticReconnect     correctly set   |   Value : "+options.isAutomaticReconnect());
-                    } else {
-                        if (op.getFirstChild("debug").boolValue())
-                            System.out.println("setAutomaticReconnect        default      |   Value : "+options.isAutomaticReconnect());
+                    if (op.getFirstChild("debug").boolValue()) {
+                        System.out.println("setWill                   correctly set   |   Topic    : "+topic);
+                        System.out.println("                                          |   Payload  : "+payload);
+                        System.out.println("                                          |   Qos      : "+qos);
+                        System.out.println("                                          |   Retained : "+retained);
                     }
-                    
-                    if (op.hasChildren("setCleanSession")) {
-                        if (op.getFirstChild("debug").boolValue())
-                            System.out.println("setCleanSession           correctly set   |   Value : "+options.isCleanSession());
-                    } else {
-                        if (op.getFirstChild("debug").boolValue())
-                            System.out.println("setCleanSession              default      |   Value : "+options.isCleanSession());
+                } else {
+                    if (op.getFirstChild("debug").boolValue()) {
+                        System.out.println("setWill                      default      |   Value : "+options.getWillMessage());
                     }
-                    
-                    if (op.hasChildren("setConnectionTimeout")) {
-                        if (op.getFirstChild("debug").boolValue())
-                            System.out.println("setConnectionTimeout      correctly set   |   Value : "+options.getConnectionTimeout());
-                    } else {
-                        if (op.getFirstChild("debug").boolValue())
-                            System.out.println("setConnectionTimeout         default      |   Value : "+options.getConnectionTimeout());
-                    }
-                    
-                    if (op.hasChildren("setKeepAliveInterval")) {
-                        if (op.getFirstChild("debug").boolValue())
-                            System.out.println("setKeepAliveInterval      correctly set   |   Value : "+options.getKeepAliveInterval());
-                    } else {
-                        if (op.getFirstChild("debug").boolValue())
-                            System.out.println("setKeepAliveInterval         default      |   Value : "+options.getKeepAliveInterval());
-                    }
-                    
-                    if (op.hasChildren("setMaxInflight")) {
-                        if (op.getFirstChild("debug").boolValue())
-                            System.out.println("setMaxInflight            correctly set   |   Value : "+options.getMaxInflight());
-                    } else {
-                        if (op.getFirstChild("debug").boolValue())
-                            System.out.println("setMaxInflight               default      |   Value : "+options.getMaxInflight());
-                    }
-                    
-                    if (op.hasChildren("setUserName")) {
-                        if (op.getFirstChild("debug").boolValue())
-                            System.out.println("setUserName               correctly set   |   Value : "+options.getUserName());
-                    } else {
-                        if (op.getFirstChild("debug").boolValue())
-                            System.out.println("setUserName                  default      |   Value : "+options.getUserName());
-                    }
-                    
-                    if (op.hasChildren("setPassword")) {
-                        if (op.getFirstChild("debug").boolValue()) {
-                            String password = "";
-                            for (char c : options.getPassword())
-                                password += c;
-                            System.out.println("setPassword               correctly set   |   Value : "+password);
-                        }
-                    } else {
-                        if (op.getFirstChild("debug").boolValue())
-                            System.out.println("setPassword                  default      |   Value : "+options.getPassword());
-                    }
-                    
-                    if (op.hasChildren("setWill")) {
-                        Value setWill = op.getFirstChild("setWill");
-                        String topic = setWill.getFirstChild("topicWill").strValue();
-                        String payload = setWill.getFirstChild("payloadWill").strValue();
-                        int qos = setWill.getFirstChild("qos").intValue();
-                        boolean retained = setWill.getFirstChild("retained").boolValue();
-                        if (op.getFirstChild("debug").boolValue()) {
-                            System.out.println("setWill                   correctly set   |   Topic    : "+topic);
-                            System.out.println("                                          |   Payload  : "+payload);
-                            System.out.println("                                          |   Qos      : "+qos);
-                            System.out.println("                                          |   Retained : "+retained);
-                        }
-                    } else {
-                        if (op.getFirstChild("debug").boolValue())
-                            System.out.println("setWill                      default      |   Value : "+options.getWillMessage());
-                    }
-                    
-                    if (op.hasChildren("setSocketFactory")) {
-                        Value socketFactory = op.getFirstChild("setSocketFactory");
-                        String caCrtFile = socketFactory.getFirstChild("caCrtFile").strValue();
-                        String crtFile = socketFactory.getFirstChild("crtFile").strValue();
-                        String keyFile = socketFactory.getFirstChild("keyFile").strValue();
-                        String password = socketFactory.getFirstChild("password").strValue();
-                        if (op.getFirstChild("debug").boolValue()) {
-                            System.out.println("=========================================================================================================");
-                            System.out.println("                                       SSL OPTIONS                                     ");
-                            System.out.println("=========================================================================================================");
-                            System.out.println("caCrtFile                      path       |   Value : "+caCrtFile);
-                            System.out.println("crtFile                        path       |   Value : "+crtFile);
-                            System.out.println("keyFile                        path       |   Value : "+keyFile);
-                            System.out.println("password                                  |   Value : "+password);
-                        } 
-                    }
-                    
-                    System.out.println("=========================================================================================================");
-                    
                 }
             }
-            System.setProperty("https.protocols", "TLSv1.2");
+            if (request.getFirstChild("options").getFirstChild("debug").boolValue()) {
+                System.out.println("================================================================================");
+            }
+            
             client.connect(options);
             if (request.hasChildren("subscribe")) {
                 client.setCallback(new SubscribeCallback(this));

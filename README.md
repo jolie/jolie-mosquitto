@@ -9,7 +9,7 @@ Jolie connector for Mosquitto framework
 
 The MQTT protocol is based on the principle of publishing messages and subscribing to topics, or "pub/sub". Multiple clients connect to a broker and subscribe to topics that they are interested in. Clients also connect to the broker and publish messages to topics. Many clients may subscribe to the same topics and do with the information as they please. The broker and MQTT act as a simple, common interface for everything to connect to.
 
-![Architecture](https://github.com/rickyiatto/Jolie_Mosquitto/blob/develop/architecture.png)
+![Architecture](https://github.com/jolie/jolie-mosquitto/blob/master/architecture.png)
 
 JavaService uses the Paho library to create both the publisher and the subscriber.
 Jolie's client service communicates with the JavaService, which takes care of creating a publisher client, creating the connection with the Mosquitto broker and finally transmitting the message.
@@ -296,7 +296,7 @@ In the ```main``` method, instead, it develops four operations:
 - **setUsername:** sets the username of the user who wants to connect to the chat.
 - **sendChatMessage:** publish the messages sent in the chat at the broker Mosquitto to the topic set in the connection. The message is converted into a json to allow the sending of additional information along with the message text.
 - **receive:** receives the messages from broker Mosquitto and saves them in a global variable ```messageQueue```.
-- **getChatMessages:** this operation reads all the messages in the queue, sends them to the WebService which prints them in the chat and empties the ```messageQueueue```. This operation is called cyclically every 0.5 seconds by the web page.
+- **getChatMessages:** this operation reads all the messages in the queue, sends them to the WebService which prints them in the chat and empties the ```messageQueue```. This operation is called cyclically every 0.5 seconds by the web page.
 
 ## Options
 
@@ -447,3 +447,104 @@ To do this you need to set the certificate paths in the ```setSocketFactory``` o
     }
     setMosquitto@Mosquitto (request)()
 ```
+
+### MOSQUITTO PLUGIN :
+
+This plugin was developed to allow the Mosquitto connector to be transparent to the developer.
+This way a developer can develop his application and then choose to use MQTT as a data transmission protocol.
+The plugin will be embedded to the client-side service and will capture all requests that pass through the outputPort connected to the server-side service.
+Once captured the request it will send it to broker Mosquitto on a well defined topic.
+On the server side the plugin will subscribe to all the topics coming from the client and every time a message arrives it will be delivered to the server side service through its inputPort.
+Finally the plugin, in case of RequestResponse operations, will transmit the response to the client side service always passing through Mosquitto broker.
+In this way the developer will be able to design his services as if the communication was done in a direct way, while in the middle the plugin will use the broker Mosquitto to transmit data from one service to another.
+
+In the case of a simple ```client.ol``` service that communicates with a ```server.ol``` service, the resulting architecture will be as follows:
+
+![Plugin_Architecture](https://github.com/jolie/jolie-mosquitto/blob/master/plugin_diagram.png)
+
+To achieve this behavior, the plugin uses the potential of ```MetaRender``` and ```MetaJolie``` services offered by the Jolie language.
+Launching the service ```mqttTransformPort.ol``` in the same directory of the desired service and passing it as parameters (```service_name```, ```port_name```, ```ouput/input```) will automatically generate a ```mosquittoPlugin.ol``` file that will be able to intercept requests and responses in or out of the port and divert them to the Mosquitto broker.
+
+Once this process is performed on both client and server side, it will be enough to embed the ```mosquittoPlugin.ol``` files to the respective client-side and server-side services.
+
+The generated ```mosquittoPlugin.ol``` file has the same name but different content depending on whether it is created for the client-side service (passing as last argument ```output```), or for the server-side service (passing as last argument ```input```).
+
+Let's see now in the detail the example in the mosquitto_plugin directory.
+
+This is an example taken from Jolie's official documentation, where a ```client.ol``` service requires the user to enter two operands and the operation you want to perform [sum|mul|div|sub].
+This request is sent to the ```calculator.ol``` service that using the principles of dynamic embedding, calculates the result of the operation and sends the response to the client.
+
+As you can see, the example has been divided into two folders ```/client``` and ```/server``` to simulate a real case.
+In both folders you need to add the ```JolieMosquittoConnector.jar``` connector and the jar of the Eclipse Paho library ```org.eclipse.paho.client.mqttv3-1.1.2-20170804.042534-34.jar```.
+
+At this point, inside both folders you have to launch the file ```mqttTransformPort.ol``` passing as arguments:
+
+- ```service_name```: the name of the service you want to communicate via mqtt;
+- ```port_name```: the name of the port that makes this service communicate with the other service;
+- ```input/output```: input in case it is an inputPort, output in case it is an outputPort.
+
+In this case the two calls will be:
+
+- in the /client folder: ```jolie mqttTransformPort.ol client.ol Calculator output```
+- in the /server folder: ```jolie mqttTransformPort.ol calculator.ol Calculator input```
+
+After these calls in both folders a ```mosquittoPlugin.ol``` file will be generated automatically.
+Each of these files will have to be embedded to its corresponding service.
+In the ```client.ol``` file I added a static embedding using the following lines of code:
+
+```java
+embedded {
+    Jolie: "mosquittoPlugin.ol" in Calculator
+}
+```
+
+In the ```calculator.ol``` file I used runtime embedding in the init section of the service:
+
+```java
+emb << {
+    filepath = "mosquittoPlugin.ol",
+    type = "Jolie"
+}
+loadEmbeddedService@Runtime( emb )(  )
+```
+
+Now if you launch the ```calculator.ol``` service and then the ```client.ol``` service you will get the desired result, but in reality the messages have been transferred through the broker Mosquitto.
+
+As last thing, I would like to explain how the topics are automatically generated.
+If you look at the client-side generated ```mosquittoPlugin.ol``` file, you will notice that:
+
+```java
+init {
+    clientToken = new
+    topicRootResponse = "mqttTransform4Jolie/response/socket://localhost:8000/"+clientToken
+    topicRootRequest = "mqttTransform4Jolie/request/socket://localhost:8000/"+clientToken
+    req << {
+        brokerURL = "tcp://mqtt.eclipse.org:1883"
+        subscribe << {
+            topic = topicRootResponse+"/#"
+        }
+    }
+    setMosquitto@Mosquitto (req)()
+}
+```
+
+The client-side plugin subscribes to the topic ```"mqttTransform4Jolie/response/socket://localhost:8000/"+clientToken```:
+
+- ```mqttTransform4Jolie```: is a string useful to understand that the topic was generated by the plugin;
+- ```response```: indicates that responses are published on this topic;
+- ```socket://localhost:8000```: is the location of the outputPort that communicates with the ```calculator.ol``` service;
+- ```clientToken```: is a token that uniquely identifies me the client.
+
+In this way the client-side plugin receives from Mosquitto all messages published as response and referred to the desired client.
+
+Within each operation, the request sent by ```client.ol``` and directed to ```calculator.ol``` is captured, transformed into a json string and sent to Mosquitto publishing on the topic ```topicRootRequest+"/<operation_name>/"+csets.session_token```:
+
+As you can see in the ```init```: ```topicRootRequest = "mqttTransform4Jolie/request/socket://localhost:8000/"+clientToken```
+
+The message is then published on a topic that indicates that it is a ```request``` and also inserts a ```session token``` that identifies the session to which the request refers.
+In this way the plugin can wait to receive the response from Mosquitto for the correct session. 
+
+The server-side plugin subscribes to the request topic.
+Based on the operation name contained in the topic, it sends the message to the corresponding operation of the ```calculator.ol``` service.
+Finally, in case of ```RequestResponse``` operations, it captures the ```response``` and publishes it on Mosquitto to the ```response``` topic with the corresponding ```session token```.
+In this way client-side plugin is able to correlate the response to the right request.
