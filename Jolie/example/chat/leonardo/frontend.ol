@@ -39,7 +39,7 @@ inputPort Frontend {
 init {
     
     request << {
-        brokerURL = "ssl://localhost:8883",
+        brokerURL = "tcp://mqtt.eclipse.org:1883",
         subscribe << {
             topic = "jolie/test/chat"
         }
@@ -65,8 +65,7 @@ init {
 
 main {
 
-    [ receive (request) ]
-    {
+    [ receive (request) ] {
         getJsonValue@JsonUtils(request.message)(jsonMessage)
         global.messageQueue[#global.messageQueue] << {
             message = jsonMessage.message
