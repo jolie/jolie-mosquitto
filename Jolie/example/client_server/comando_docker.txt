@@ -1,1 +1,0 @@
-docker run -it --name mosquitto -p 127.0.0.1:1883:1883 --network="host" eclipse-mosquitto
