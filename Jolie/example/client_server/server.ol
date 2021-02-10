@@ -14,8 +14,14 @@
    limitations under the License.
 */
 
-include "mosquitto/interfaces/MosquittoInterface.iol"
-include "console.iol"
+from "./mqtt" import MQTT
+from "./mqtt" import MosquittoReceiverInteface
+from console import Console
+
+service serverMQTT {
+
+embed Console as Console
+embed MQTT as Mosquitto
 
 execution {concurrent}
 
@@ -25,18 +31,9 @@ inputPort Server {
     Interfaces: MosquittoReceiverInteface
 }
 
-outputPort Mosquitto {
-    Interfaces: MosquittoInterface
-}
-
-embedded {
-    Java: 
-        "org.jolielang.connector.mosquitto.MosquittoConnectorJavaService" in Mosquitto
-}
-
 init {
     request << {
-        brokerURL = "tcp://mqtt.eclipse.org:1883",
+        brokerURL = "tcp://localhost:1883",
         subscribe << {
             topic = "jolie/test"
         }
@@ -47,8 +44,8 @@ init {
             setConnectionTimeout = 25
             setKeepAliveInterval = 0
             setMaxInflight = 200
-            setUserName = "SERVERadmin"
-            setPassword = "passwordAdmin"
+            //setUserName = "SERVERadmin"
+            //setPassword = "passwordAdmin"
             setWill << {
                 topicWill = "home/LWT"
                 payloadWill = "server disconnected"
@@ -64,4 +61,5 @@ main {
     receive (request)
     println@Console("topic :     "+request.topic)()
     println@Console("message :   "+request.message)()
+}
 }

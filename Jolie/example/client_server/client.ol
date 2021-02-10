@@ -14,20 +14,15 @@
    limitations under the License.
 */
 
-include "mosquitto/interfaces/MosquittoInterface.iol"
+from "./mqtt" import MQTT
 
-outputPort Mosquitto {
-    Interfaces: MosquittoPublisherInterface , MosquittoInterface
-}
+service clientMQTT {
 
-embedded {
-    Java: 
-        "org.jolielang.connector.mosquitto.MosquittoConnectorJavaService" in Mosquitto
-}
+embed MQTT as Mosquitto 
 
 init {
     req << {
-        brokerURL = "tcp://mqtt.eclipse.org:1883"
+        brokerURL = "tcp://localhost:1883"
         // I can set all the options available from the Paho library
         options << {
             setAutomaticReconnect = true
@@ -35,8 +30,8 @@ init {
             setConnectionTimeout = 20
             setKeepAliveInterval = 20
             setMaxInflight = 150
-            setUserName = "CLIENTadmin"
-            setPassword = "password"
+            //setUserName = "CLIENTadmin"
+            //setPassword = "password"
             setWill << {
                 topicWill = "home/LWT"
                 payloadWill = "client disconnected"
@@ -54,4 +49,5 @@ main {
         message = args[0]
     }
     sendMessage@Mosquitto (request)()
+}
 }
