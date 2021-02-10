@@ -14,16 +14,11 @@
    limitations under the License.
 */
 
-include "mosquitto/interfaces/MosquittoInterface.iol"
+from mqtt import MQTT
 
-outputPort Mosquitto {
-    Interfaces: MosquittoPublisherInterface , MosquittoInterface
-}
+service clientMQTT {
 
-embedded {
-    Java: 
-        "org.jolielang.connector.mosquitto.MosquittoConnectorJavaService" in Mosquitto
-}
+embed MQTT as Mosquitto
 
 init {
     req << {
@@ -54,4 +49,6 @@ main {
         message = args[0]
     }
     sendMessage@Mosquitto (request)()
+}
+
 }

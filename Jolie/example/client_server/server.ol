@@ -14,23 +14,20 @@
    limitations under the License.
 */
 
-include "mosquitto/interfaces/MosquittoInterface.iol"
-include "console.iol"
+from mqtt import MQTT
+from mqtt import MosquittoReceiverInterface
+from console import Console
 
-execution {concurrent}
+service serverMQTT {
+
+embed Console as Console
+embed MQTT as Mosquitto
+
+execution: concurrent
 
 inputPort Server {
     Location: "local"
     Interfaces: MosquittoReceiverInterface
-}
-
-outputPort Mosquitto {
-    Interfaces: MosquittoInterface
-}
-
-embedded {
-    Java: 
-        "org.jolielang.connector.mosquitto.MosquittoConnectorJavaService" in Mosquitto
 }
 
 init {
@@ -63,4 +60,6 @@ main {
     receive (request)
     println@Console("topic :     "+request.topic)()
     println@Console("message :   "+request.message)()
+}
+
 }

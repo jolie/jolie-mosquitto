@@ -28,30 +28,27 @@ To be able to use the connector correctly, be sure to add both the file _JolieMo
 #### server.ol
 
 ```java
-include "mosquitto/interfaces/MosquittoInterface.iol"
-include "console.iol"
+from mqtt import MQTT
+from mqtt import MosquittoReceiverInterface
+from console import Console
 
-execution {concurrent}
+service serverMQTT {
+
+embed Console as Console
+embed MQTT as Mosquitto
+
+execution: concurrent
 
 inputPort Server {
     Location: "local"
     Interfaces: MosquittoReceiverInterface
 }
 
-outputPort Mosquitto {
-    Interfaces: MosquittoInterface
-}
-
-embedded {
-    Java: 
-        "org.jolielang.connector.mosquitto.MosquittoConnectorJavaService" in Mosquitto
-}
-
 init {
     request << {
-        brokerURL = "tcp://localhost:1883",
+        brokerURL = "tcp://mqtt.eclipseprojects.io:1883",
         subscribe << {
-            topic = "home/#"
+            topic = "jolie/test"
         }
         // I can set all the options available from the Paho library
         options << {
@@ -66,7 +63,7 @@ init {
                 topicWill = "home/LWT"
                 payloadWill = "server disconnected"
                 qos = 0
-                retained = false
+                retained = true
             }
         }
     }
@@ -78,31 +75,26 @@ main {
     println@Console("topic :     "+request.topic)()
     println@Console("message :   "+request.message)()
 }
+
+}
 ```
 
 You can modify all options values and the topic you want to subscribe in. The string "home/#" is used to subscribe on every subtopic of "home".
 An example of launch of this client is:  
     ```jolie server.ol```.
 
-The interface to be included must follow exactly the path reported ```"mosquitto/interfaces/MosquittoInterface.iol"```, as the requested file is located in the jar at this address.
-
 #### client.ol
 
 ```java
-include "mosquitto/interfaces/MosquittoInterface.iol"
+from mqtt import MQTT
 
-outputPort Mosquitto {
-    Interfaces: MosquittoPublisherInterface , MosquittoInterface
-}
+service clientMQTT {
 
-embedded {
-    Java: 
-        "org.jolielang.connector.mosquitto.MosquittoConnectorJavaService" in Mosquitto
-}
+embed MQTT as Mosquitto
 
 init {
     req << {
-        brokerURL = "tcp://localhost:1883"
+        brokerURL = "tcp://mqtt.eclipseprojects.io:1883"
         // I can set all the options available from the Paho library
         options << {
             setAutomaticReconnect = true
@@ -116,7 +108,7 @@ init {
                 topicWill = "home/LWT"
                 payloadWill = "client disconnected"
                 qos = 0
-                retained = false
+                retained = true
             }
         }
     }
@@ -125,10 +117,12 @@ init {
 
 main {
     request << {
-        topic = "home/test",
+        topic = "jolie/test",
         message = args[0]
     }
     sendMessage@Mosquitto (request)()
+}
+
 }
 ```
 
@@ -136,9 +130,7 @@ You can modify all options values and the topic you want to publish in.
 An example of launch of this client is:  
     ```jolie client.ol "hello"```.
 
-The interface to be included must follow exactly the path reported ```"mosquitto/interfaces/MosquittoInterface.iol"```, as the requested file is located in the jar at this address.
-
-#### MosquittoInterface.iol
+#### MosquittoInterface.iol respectively mqtt/mqtt.ol
 
 ```java
 type SetMosquittoRequest: void {
@@ -178,7 +170,7 @@ type MosquittoMessageRequest: void {
 }
 
 interface MosquittoPublisherInterface {
-    RequestResponse: 
+    RequestResponse:
         sendMessage (MosquittoMessageRequest)(void)
 }
 
@@ -188,8 +180,18 @@ interface MosquittoInterface {
 }
 
 interface MosquittoReceiverInterface {
-    OneWay: 
+    OneWay:
         receive (MosquittoMessageRequest)
+}
+
+service MQTT {
+    inputPort ip {
+        location: "local"
+        interfaces: MosquittoPublisherInterface, MosquittoInterface, MosquittoReceiverInterface
+    }
+    foreign java {
+        class: "org.jolielang.connector.mosquitto.MosquittoConnectorJavaService"
+    }
 }
 ```
 
