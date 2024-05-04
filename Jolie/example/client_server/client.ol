@@ -35,7 +35,7 @@ init {
             setConnectionTimeout = 20
             setKeepAliveInterval = 20
             setMaxInflight = 150
-            setUserName = "CLIENTadmin"
+            setUserName = "username"
             setPassword = "password"
             setWill << {
                 topicWill = "home/LWT"

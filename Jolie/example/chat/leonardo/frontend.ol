@@ -47,13 +47,7 @@ init {
             setCleanSession = false
             debug = true
             setUserName = "joliechat"
-            setPassword = "riccardoiattoni"
-            setSocketFactory << {
-                caCrtFile = "C:\\Program Files\\mosquitto\\certs\\ca.crt"
-                crtFile = "C:\\Program Files\\mosquitto\\certs\\server.crt"
-                keyFile = "C:\\Program Files\\mosquitto\\certs\\server.key"
-                password = "riccardoiattoni"
-            }
+            setPassword = "joliechat"
         }
     }
 

@@ -46,8 +46,8 @@ init {
             setConnectionTimeout = 25
             setKeepAliveInterval = 0
             setMaxInflight = 200
-            setUserName = "SERVERadmin"
-            setPassword = "passwordAdmin"
+            setUserName = "username"
+            setPassword = "password"
             setWill << {
                 topicWill = "home/LWT"
                 payloadWill = "server disconnected"
