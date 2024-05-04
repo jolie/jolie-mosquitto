@@ -25,40 +25,39 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 public class SubscribeCallback implements MqttCallback {
 
-        private JavaService javaService;
-    
-        public SubscribeCallback (JavaService javaService) {
-            this.javaService = javaService;
-        }
-    
-	@Override
-	public void connectionLost(Throwable cause) {
-            // I have to implement a behavior in case of lost connection		
-	}
+    private JavaService javaService;
 
-	@Override
-	public void deliveryComplete(IMqttDeliveryToken token) {
-            // method called when a message is delivered
-	}
+    public SubscribeCallback (JavaService javaService) {
+        this.javaService = javaService;
+    }
 
-	@Override
-	public void messageArrived(String topic, MqttMessage message) throws Exception {
-            Value request = Value.create();
-            request.getNewChild("topic").setValue(topic);
-            request.getNewChild("message").setValue(message.toString());
-            
-            String[] tokens = topic.split("/");
-            
-            if (tokens[0].equals("mqttTransform4Jolie")) {
-                if (tokens[tokens.length - 1].equals("response")) {
-                    request.getNewChild("session_token").setValue(tokens[tokens.length - 2]);
-                    request.getNewChild("client_token").setValue(tokens[tokens.length - 4]);
-                } else {
-                    request.getNewChild("session_token").setValue(tokens[tokens.length - 1]);
-                    request.getNewChild("client_token").setValue(tokens[tokens.length - 3]);
-                }
+    @Override
+    public void connectionLost(Throwable cause) {
+        // when connection is lost
+    }
+
+    @Override
+    public void deliveryComplete(IMqttDeliveryToken token) {
+        // method called when a message is delivered
+    }
+
+    @Override
+    public void messageArrived(String topic, MqttMessage message) throws Exception {
+        Value request = Value.create();
+        request.getNewChild("topic").setValue(topic);
+        request.getNewChild("message").setValue(message.toString());
+
+        String[] tokens = topic.split("/");
+
+        if (tokens[0].equals("mqttTransform4Jolie")) {
+            if (tokens[tokens.length - 1].equals("response")) {
+                request.getNewChild("session_token").setValue(tokens[tokens.length - 2]);
+                request.getNewChild("client_token").setValue(tokens[tokens.length - 4]);
+            } else {
+                request.getNewChild("session_token").setValue(tokens[tokens.length - 1]);
+                request.getNewChild("client_token").setValue(tokens[tokens.length - 3]);
             }
-            javaService.sendMessage(CommMessage.createRequest("receive", "/", request));
-	}
-
+        }
+        javaService.sendMessage(CommMessage.createRequest("receive", "/", request));
+    }
 }

@@ -29,7 +29,7 @@ public class MosquittoConnectorJavaService extends JavaService {
     
     private MqttClient client;
     
-    public Value setMosquitto (Value request) {
+    public Value setMosquitto(Value request) {
         String brokerURL = request.getFirstChild("brokerURL").strValue();
         String clientId;
         if (request.hasChildren("clientId")) {
@@ -160,16 +160,15 @@ public class MosquittoConnectorJavaService extends JavaService {
                 }
             }
             
-	} catch (MqttException e) {
+        } catch (MqttException e) {
             e.printStackTrace();
-	}
+        }
         return Value.create();
     }
     
-    public Value sendMessage (Value request) {
-        
+    public Value sendMessage(Value request) {
         MqttTopic topic = client.getTopic(request.getFirstChild("topic").strValue());
-		
+
         try {
             topic.publish(new MqttMessage(request.getFirstChild("message").strValue().getBytes()));
         } catch (MqttException ex) {
