@@ -35,7 +35,6 @@ execution {concurrent}
 
 inputPort Server {
     Location: "local"
-    Protocol: sodep
     Interfaces: MosquittoReceiverInteface
 }
 
@@ -232,7 +231,6 @@ embedded {
 
 inputPort Frontend {
     Location: "local"
-    Protocol: sodep
     Interfaces: MosquittoReceiverInteface, FrontendInterface
 }
 

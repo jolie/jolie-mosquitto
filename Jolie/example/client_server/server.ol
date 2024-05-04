@@ -21,7 +21,6 @@ execution {concurrent}
 
 inputPort Server {
     Location: "local"
-    Protocol: sodep
     Interfaces: MosquittoReceiverInteface
 }
 

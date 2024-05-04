@@ -39,7 +39,6 @@ execution {concurrent}
 
 inputPort Input {
     Location: \"local\"
-    Protocol: sodep
     Interfaces: "+outputPortResponse.output[out].interfaces.name+", MosquittoReceiverInteface
 }
 
@@ -134,7 +133,6 @@ execution {concurrent}
 
 inputPort Input {
     Location: \"local\"
-    Protocol: sodep
     Interfaces: "+inputPortResponse.input[inp].interfaces.name+", MosquittoReceiverInteface
 }
         

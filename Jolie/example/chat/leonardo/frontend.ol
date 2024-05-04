@@ -32,7 +32,6 @@ embedded {
 
 inputPort Frontend {
     Location: "local"
-    Protocol: sodep
     Interfaces: MosquittoReceiverInteface, FrontendInterface
 }
 

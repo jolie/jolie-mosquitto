@@ -20,7 +20,6 @@ execution {concurrent}
 
 inputPort Input {
     Location: "local"
-    Protocol: sodep
     Interfaces: CalculatorInterface, MosquittoReceiverInteface
 }
         
