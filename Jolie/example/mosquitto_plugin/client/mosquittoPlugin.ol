@@ -37,7 +37,7 @@ init {
     topicRootResponse = "mqttTransform4Jolie/response/socket://localhost:8000/"+clientToken
     topicRootRequest = "mqttTransform4Jolie/request/socket://localhost:8000/"+clientToken
     req << {
-        brokerURL = "tcp://mqtt.eclipse.org:1883"
+        brokerURL = "tcp://mqtt.eclipseprojects.io:1883"
         subscribe << {
             topic = topicRootResponse+"/#"
         }

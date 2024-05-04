@@ -56,7 +56,7 @@ init {
     topicRootResponse = \"mqttTransform4Jolie/response/"+outputPortResponse.output[out].location+"/\"+clientToken
     topicRootRequest = \"mqttTransform4Jolie/request/"+outputPortResponse.output[out].location+"/\"+clientToken
     req << {
-        brokerURL = \"tcp://mqtt.eclipse.org:1883\"
+        brokerURL = \"tcp://mqtt.eclipseprojects.io:1883\"
         subscribe << {
             topic = topicRootResponse+\"/#\"
         }
@@ -155,7 +155,7 @@ init {
     topicRootResponse = \"mqttTransform4Jolie/response/"+inputPortResponse.input[inp].location+"\"
     topicRootRequest = \"mqttTransform4Jolie/request/"+inputPortResponse.input[inp].location+"\"
     req << {
-        brokerURL = \"tcp://mqtt.eclipse.org:1883\"
+        brokerURL = \"tcp://mqtt.eclipseprojects.io:1883\"
         subscribe << {
             topic = topicRootRequest + \"/#\"
         }

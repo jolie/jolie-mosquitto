@@ -27,7 +27,7 @@ embedded {
 
 init {
     req << {
-        brokerURL = "tcp://mqtt.eclipse.org:1883"
+        brokerURL = "tcp://mqtt.eclipseprojects.io:1883"
         // I can set all the options available from the Paho library
         options << {
             setAutomaticReconnect = true

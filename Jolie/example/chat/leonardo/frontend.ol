@@ -38,7 +38,7 @@ inputPort Frontend {
 init {
     
     request << {
-        brokerURL = "tcp://mqtt.eclipse.org:1883",
+        brokerURL = "tcp://mqtt.eclipseprojects.io:1883",
         subscribe << {
             topic = "jolie/test/chat"
         }
