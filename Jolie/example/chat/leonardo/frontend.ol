@@ -44,8 +44,6 @@ init {
         }
         // I can set all the options available from the Paho library
         options << {
-            setCleanSession = false
-            debug = true
             setUserName = "joliechat"
             setPassword = "joliechat"
         }

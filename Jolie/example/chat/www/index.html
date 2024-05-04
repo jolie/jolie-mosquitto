@@ -1,9 +1,14 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 	<head>
-		<link href="cssChat.css" rel="stylesheet" type="text/css">
-		<script type="text/javascript" src="jquery-1.10.2.js"></script>
+		<meta charset="utf-8">
+		<title>Chat</title>
+		<link rel="stylesheet" href="cssChat.css">
+		<script src="jquery-1.10.2.js"></script>
 		<script>
-			function callJolie(operation, request, callback) {
+			'use strict';
+
+			function callJolie(operation, request, errorMessage, callback) {
 				$.ajax({
 					url: '/' + operation,
 					dataType: 'json',
@@ -11,30 +16,35 @@
 					type: 'POST',
 					contentType: 'application/json',
 					success: function (data) {
-						callback(data);
+						callback(data)
 					}
 					,
 					error: function (errorType, textStatus, errorThrown) {
-						alert(errorThrown);
+						alert(errorMessage)
 					}
-				});
-			};
+				})
+			}
 
 			function setUsername() {
-				var request = { "username": $("#nickname").val() }
-				callJolie("setUsername", request, function(data) { });
-				window.location.href = "chat.html";
+				window.event.preventDefault() // disable form action
+
+				const request = { "username": $("#nickname").val() }
+				callJolie("setUsername", request, "Could not set the username", function(data) {
+					window.location.href = "chat.html"
+				})
 			}
 		</script>
 	</head>
 	
 	<body>
-		<div id="div">
+		<div>
 			<h1 id="title">JOLIE CHAT using MOSQUITTO</h1>
 		</div>
 		<div id="divNickname">
-			<input id="nickname" type="text" placeholder="insert your nickname" size="40" maxlength="200" />
-			<button onclick="setUsername()">Go to Chat</button>
+			<form onsubmit="setUsername()">
+				<input id="nickname" type="text" placeholder="insert your nickname" required size="40" minlength="1" maxlength="200">
+				<button type="submit">Go to the Chat</button>
+			</form>
 		</div>
 	</body>
 </html>

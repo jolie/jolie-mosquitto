@@ -1,9 +1,16 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 	<head>
-		<link href="cssChat.css" rel="stylesheet" type="text/css">
-		<script type="text/javascript" src="jquery-1.10.2.js"></script>
+		<meta charset="utf-8">
+		<title>Chat</title>
+		<link rel="stylesheet" href="cssChat.css">
+		<script src="jquery-1.10.2.js"></script>
 		<script>
-			function callJolie(operation, request, callback) {
+			'use strict';
+
+			const CHECK_MESSAGES_INTERVAL_MS = 500
+
+			function callJolie(operation, request, errorMessage, callback) {
 				$.ajax({
 					url: '/' + operation,
 					dataType: 'json',
@@ -11,24 +18,21 @@
 					type: 'POST',
 					contentType: 'application/json',
 					success: function (data) {
-						callback(data);
+						callback(data)
 					}
 					,
 					error: function (errorType, textStatus, errorThrown) {
-						alert(errorThrown);
+						alert(errorMessage)
 					}
-				});
-			};
-
-			var checkNewMessage = setInterval(getChatMessages, 500);
+				})
+			}
 
 			function getChatMessages() {
-				var request = { }
-				callJolie("getChatMessages", request, function(data) {
-					if (typeof data.messageQueue != 'undefined') {
-						for (i=0; i<data.messageQueue.length; i++) {
-							var divChat = document.getElementById('textChat');
-							if (data.messageQueue[i].username == data.messageQueue[i].session_user) {
+				callJolie("getChatMessages", { }, "Could not retrieve a message", function(data) {
+					if (typeof data.messageQueue !== 'undefined') {
+						for (let i=0; i<data.messageQueue.length; i++) {
+							const divChat = document.getElementById('textChat');
+							if (data.messageQueue[i].username === data.messageQueue[i].session_user) {
 								divChat.innerHTML += '<div id="divMyMessage"> <b>' + data.messageQueue[i].username.toUpperCase()+'</b>   :   '+data.messageQueue[i].message +'</div>';
 							} else {
 								divChat.innerHTML += '<div id="divOtherMessage"> <b>' + data.messageQueue[i].username.toUpperCase()+'</b>   :   '+data.messageQueue[i].message +'</div>';
@@ -37,24 +41,26 @@
 					}
 				})
 			}
+			setInterval(getChatMessages, CHECK_MESSAGES_INTERVAL_MS)
 			
 			function sendChatMessage() {
-				var request = { "message": $("#mex").val() }
-				callJolie("sendChatMessage", request, function(data) { });
-				document.getElementById("mex").value = "";
+				const request = { "message": $("#mex").val() }
+				callJolie("sendChatMessage", request, "Could not send the message", function(data) {
+					document.getElementById("mex").value = ""
+				})
 			}
 		</script>
 	</head>
 
 	<body>
-		<div id="div">
+		<div>
 			<h1 id="title">JOLIE CHAT using MOSQUITTO</h1>
 		</div>
 		<div id="textChat">
 			<!-- <textarea id="textChat" readonly="readonly" rows="14" cols="125"></textarea> -->
 		</div>
-		<div id="div">
-			<input id="mex" type="text" placeholder="type your message here" size="75" maxlength="200" />
+		<div>
+			<input id="mex" type="text" placeholder="type your message here" size="75" maxlength="200">
 			<button onclick="sendChatMessage()">Send</button>
 		</div>
 	</body>
