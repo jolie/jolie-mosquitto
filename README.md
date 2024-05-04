@@ -19,9 +19,9 @@ To install the Mosquitto broker on your computer follow the instructions provide
 
 ## Example
 
-To be able to use the connector correctly, be sure to add both the file JolieMosquittoConnector.jar and org.eclipse.paho.client.mqttv3-1.1.2-20170804.042534-34.jar to your project folder.
+To be able to use the connector correctly, be sure to add both the file _JolieMosquittoConnector.jar_ and _org.eclipse.paho.client.mqttv3-1.2.5.jar_ to your project folder.
 - ```JolieMosquittoConnector.jar``` contains both the connector and the interfaces necessary for the Jolie service to communicate with the Mosquitto broker.
-- ```org.eclipse.paho.client.mqttv3-1.1.2-20170804.042534-34.jar``` is the dependency on the Paho library that JavaService uses to create the publisher and subscriber.
+- ```org.eclipse.paho.client.mqttv3-1.2.5.jar``` is the dependency on the Paho library that JavaService uses to create the publisher and subscriber.
 
 ### CLIENT - SERVER :
 
@@ -473,7 +473,7 @@ This is an example taken from Jolie's official documentation, where a ```client.
 This request is sent to the ```calculator.ol``` service that using the principles of dynamic embedding, calculates the result of the operation and sends the response to the client.
 
 As you can see, the example has been divided into two folders ```/client``` and ```/server``` to simulate a real case.
-In both folders you need to add the ```JolieMosquittoConnector.jar``` connector and the jar of the Eclipse Paho library ```org.eclipse.paho.client.mqttv3-1.1.2-20170804.042534-34.jar```.
+In both folders you need to add the ```JolieMosquittoConnector.jar``` connector and the jar of the Eclipse Paho library.
 
 At this point, inside both folders you have to launch the file ```mqttTransformPort.ol``` passing as arguments:
 
