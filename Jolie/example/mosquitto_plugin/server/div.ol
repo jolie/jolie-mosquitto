@@ -7,6 +7,8 @@ inputPort Op {
 
 main {
   run( request )( response ) {
+    if ( request.y == 0.0 )
+      throw ( DivisionByZero )
     response = request.x / request.y
   }
 }

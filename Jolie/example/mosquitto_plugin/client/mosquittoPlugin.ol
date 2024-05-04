@@ -1,19 +1,7 @@
-type RequestType:void {
-  .x[1,1]:double
-  .y[1,1]:double
-}
-
-interface CalculatorInterface {
-RequestResponse:
-  div( RequestType )( double ),
-  mul( RequestType )( double ),
-  sub( RequestType )( double ),
-  sum( RequestType )( double )
-}
-
+include "mosquitto/interfaces/MosquittoInterface.iol"
+include "../server/CalculatorInterface.iol"
 
 include "console.iol"
-include "mosquitto/interfaces/MosquittoInterface.iol"
 include "json_utils.iol"
 
 execution {concurrent}
@@ -61,7 +49,9 @@ main {
         sendMessage@Mosquitto (requestMosquitto)()
 
         receive(reqReceive)
-        
+        if ( reqReceive.message == "NaN" )
+            throw ( DivisionByZero )
+
         getJsonValue@JsonUtils(reqReceive.message)(jsonMessage)
         response << jsonMessage
     }]

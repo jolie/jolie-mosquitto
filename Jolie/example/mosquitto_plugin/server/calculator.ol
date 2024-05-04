@@ -1,7 +1,7 @@
-include "runtime.iol"
-
 include "OperationInterface.iol"
 include "CalculatorInterface.iol"
+
+include "runtime.iol"
 
 execution{ concurrent }
 

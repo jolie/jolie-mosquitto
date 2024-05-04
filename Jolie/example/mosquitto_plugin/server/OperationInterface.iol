@@ -6,5 +6,5 @@ type RequestType: void {
 /* this interface must be implemented by all the services which will be embedded by the parent one */
 interface OperationInterface {
   RequestResponse:
-    run( RequestType )( double )
+    run( RequestType )( double ) throws DivisionByZero
 }

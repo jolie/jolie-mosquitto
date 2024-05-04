@@ -1,6 +1,7 @@
+include "../server/CalculatorInterface.iol"
+
 include "console.iol"
 include "time.iol"
-include "CalculatorInterface.iol"
 
 outputPort Calculator {
   Location: "socket://localhost:8000"
@@ -30,7 +31,10 @@ main {
   } else if ( operation == "sub" ) {
     sub@Calculator( request )( response )
   } else if ( operation == "div" ) {
-    div@Calculator( request )( response )
+    scope ( div ) {
+      install ( DivisionByZero => response = "NaN" )
+      div@Calculator( request )( response )
+    }
   } else if ( operation == "mul" ) {
     mul@Calculator( request )( response )
   }
