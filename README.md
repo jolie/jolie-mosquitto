@@ -19,8 +19,8 @@ To install the Mosquitto broker on your computer follow the instructions provide
 
 ## Example
 
-To be able to use the connector correctly, be sure to add both the file _JolieMosquittoConnector.jar_ and _org.eclipse.paho.client.mqttv3-1.2.5.jar_ to your project folder.
-- ```JolieMosquittoConnector.jar``` contains both the connector and the interfaces necessary for the Jolie service to communicate with the Mosquitto broker.
+To be able to use the connector correctly, be sure to add both the file _mosquitto.jap_ and _org.eclipse.paho.client.mqttv3-1.2.5.jar_ to your project folder.
+- ```mosquitto.jap``` contains both the connector and the interfaces necessary for the Jolie service to communicate with the Mosquitto broker.
 - ```org.eclipse.paho.client.mqttv3-1.2.5.jar``` is the dependency on the Paho library that JavaService uses to create the publisher and subscriber.
 
 ### CLIENT - SERVER :
@@ -28,8 +28,8 @@ To be able to use the connector correctly, be sure to add both the file _JolieMo
 #### server.ol
 
 ```java
-from mqtt import MQTT
-from mqtt import MosquittoReceiverInterface
+from mosquitto.mqtt.mqtt import MQTT
+from mosquitto.mqtt.mqtt import MosquittoReceiverInterface
 from console import Console
 
 service serverMQTT {
@@ -86,7 +86,7 @@ An example of launch of this client is:
 #### client.ol
 
 ```java
-from mqtt import MQTT
+from mosquitto.mqtt.mqtt import MQTT
 
 service clientMQTT {
 
@@ -202,8 +202,7 @@ You can also specify some values of the ```options``` to customize the connectio
 
 The ```MosquittoReceiverInterface``` exposes a method called ```receive``` which receives a ```MosquittoMessageRequest``` request, described above.
 
-This interface is already inside the ```JolieMosquittoConnector.jar``` file.
-To be included correctly you need to call it through the string ```include "mosquitto/interfaces/MosquittoInterface.iol"```.
+The interface is located inside the ```moquitto.jap``` file (or ```JolieMosquittoConnector.jar``` for the older API).
 
 ### CHAT :
 

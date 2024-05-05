@@ -14,8 +14,8 @@
    limitations under the License.
 */
 
-from mqtt import MQTT
-from mqtt import MosquittoReceiverInterface
+from mosquitto.mqtt.mqtt import MQTT
+from mosquitto.mqtt.mqtt import MosquittoReceiverInterface
 from console import Console
 
 service serverMQTT {

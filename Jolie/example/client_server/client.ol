@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-from mqtt import MQTT
+from mosquitto.mqtt.mqtt import MQTT
 
 service clientMQTT {
 
