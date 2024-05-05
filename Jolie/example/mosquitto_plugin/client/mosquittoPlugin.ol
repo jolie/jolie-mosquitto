@@ -8,7 +8,7 @@ execution {concurrent}
 
 inputPort Input {
     Location: "local"
-    Interfaces: CalculatorInterface, MosquittoReceiverInteface
+    Interfaces: CalculatorInterface, MosquittoReceiverInterface
 }
 
 outputPort Mosquitto {

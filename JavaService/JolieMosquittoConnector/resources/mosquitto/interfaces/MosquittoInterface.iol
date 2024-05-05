@@ -52,7 +52,7 @@ interface MosquittoInterface {
         setMosquitto (SetMosquittoRequest)(void)
 }
 
-interface MosquittoReceiverInteface {
+interface MosquittoReceiverInterface {
     OneWay: 
         receive (MosquittoRequest)
 }

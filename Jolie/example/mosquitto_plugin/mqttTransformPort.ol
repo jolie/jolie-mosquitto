@@ -39,7 +39,7 @@ execution {concurrent}
 
 inputPort Input {
     Location: \"local\"
-    Interfaces: "+outputPortResponse.output[out].interfaces.name+", MosquittoReceiverInteface
+    Interfaces: "+outputPortResponse.output[out].interfaces.name+", MosquittoReceiverInterface
 }
 
 outputPort Mosquitto {
@@ -133,7 +133,7 @@ execution {concurrent}
 
 inputPort Input {
     Location: \"local\"
-    Interfaces: "+inputPortResponse.input[inp].interfaces.name+", MosquittoReceiverInteface
+    Interfaces: "+inputPortResponse.input[inp].interfaces.name+", MosquittoReceiverInterface
 }
         
 outputPort Output {

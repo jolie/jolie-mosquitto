@@ -35,7 +35,7 @@ execution {concurrent}
 
 inputPort Server {
     Location: "local"
-    Interfaces: MosquittoReceiverInteface
+    Interfaces: MosquittoReceiverInterface
 }
 
 outputPort Mosquitto {
@@ -187,7 +187,7 @@ interface MosquittoInterface {
         setMosquitto (SetMosquittoRequest)(void),
 }
 
-interface MosquittoReceiverInteface {
+interface MosquittoReceiverInterface {
     OneWay: 
         receive (MosquittoMessageRequest)
 }
@@ -198,7 +198,7 @@ The ```MosquittoPublisherInterface``` exposes a method called ```sendMessage``` 
 The ```MosquittoInterface``` exposes a method called ```setMosquitto``` which receives in input a request of the type ```SetMosquittoRequest```. This type requires two mandatory fields: a ```brokerURL``` (which is used to connect to the broker Mosquitto) and a ```clientId``` (if not specified a random one is generated).
 You can also specify some values of the ```options``` to customize the connection (if not specified, the default values are used).
 
-The ```MosquittoReceiverInteface``` exposes a method called ```receive``` which receives a ```MosquittoMessageRequest``` request, described above.
+The ```MosquittoReceiverInterface``` exposes a method called ```receive``` which receives a ```MosquittoMessageRequest``` request, described above.
 
 This interface is already inside the ```JolieMosquittoConnector.jar``` file.
 To be included correctly you need to call it through the string ```include "mosquitto/interfaces/MosquittoInterface.iol"```.
@@ -231,7 +231,7 @@ embedded {
 
 inputPort Frontend {
     Location: "local"
-    Interfaces: MosquittoReceiverInteface, FrontendInterface
+    Interfaces: MosquittoReceiverInterface, FrontendInterface
 }
 
 init {

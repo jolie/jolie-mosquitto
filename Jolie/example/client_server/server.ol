@@ -21,7 +21,7 @@ execution {concurrent}
 
 inputPort Server {
     Location: "local"
-    Interfaces: MosquittoReceiverInteface
+    Interfaces: MosquittoReceiverInterface
 }
 
 outputPort Mosquitto {

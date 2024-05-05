@@ -32,7 +32,7 @@ embedded {
 
 inputPort Frontend {
     Location: "local"
-    Interfaces: MosquittoReceiverInteface, FrontendInterface
+    Interfaces: MosquittoReceiverInterface, FrontendInterface
 }
 
 init {
