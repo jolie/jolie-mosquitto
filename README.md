@@ -214,21 +214,41 @@ To test the chat with your friends without necessarily having a server with Mosq
 #### frontend.ol
 
 ```java
-include "FrontendInterface.iol"
-include "mosquitto/interfaces/MosquittoInterface.iol"
-include "console.iol"
-include "json_utils.iol"
+from mosquitto.mqtt.mqtt import MQTT
+from mosquitto.mqtt.mqtt import MosquittoReceiverInterface
+from console import Console
+from json_utils import JsonUtils
 
-execution {concurrent}
-
-outputPort Mosquitto {
-    Interfaces: MosquittoPublisherInterface , MosquittoInterface
+type SendChatMessageRequest: void {
+    message: string
 }
 
-embedded {
-    Java: 
-        "org.jolielang.connector.mosquitto.MosquittoConnectorJavaService" in Mosquitto
+type GetChatMessagesResponse: void {
+    messageQueue*: void {
+        message: string
+        username: string
+        session_user: string
+    }
 }
+
+type SetUsernameRequest: void {
+    username: string
+}
+
+interface FrontendInterface {
+    RequestResponse:
+		sendChatMessage( SendChatMessageRequest )( void ),
+        getChatMessages( void )( GetChatMessagesResponse ),
+        setUsername( SetUsernameRequest )( void )
+}
+
+service Frontend {
+
+embed MQTT as Mosquitto
+embed Console as Console
+embed JsonUtils as JsonUtils
+
+execution: concurrent
 
 inputPort Frontend {
     Location: "local"
@@ -236,28 +256,29 @@ inputPort Frontend {
 }
 
 init {
-    
     request << {
         brokerURL = "tcp://mqtt.eclipseprojects.io:1883",
         subscribe << {
             topic = "jolie/test/chat"
         }
         // I can set all the options available from the Paho library
-        options.debug = true
+        options << {
+            setUserName = "joliechat"
+            setPassword = "joliechat"
+        }
     }
+
     setMosquitto@Mosquitto (request)()
     println@Console("SUBSCRIBER connection done! Waiting for message on topic : "+request.subscribe.topic)()
-    
 }
 
 main {
-
-    [ receive (request) ]
-    {
+    [ receive (request) ] {
         getJsonValue@JsonUtils(request.message)(jsonMessage)
         global.messageQueue[#global.messageQueue] << {
             message = jsonMessage.message
             username = jsonMessage.username
+            session_user = global.username
         }
     }
 
@@ -287,17 +308,19 @@ main {
         println@Console("Username set for the current session: "+global.username)()
     }]
 }
+
+}
 ```
 
-The ```frontend.ol``` service presents an ```outputPort``` in which the JavaService described in the previous example is embedded, while the ```inputPort``` communicates both with the JavaService and with the ```FrontendInterface``` interface.
-In the ```init``` method, it prepares the request (setting all the desired parameters) to send to the JavaService to open a connection with the broker Mosquitto.
+The ```frontend.ol``` service presents an ```inputPort``` which communicates both with Mqtt (```MosquittoReceiverInterface```) and with the ```FrontendInterface``` interface.
+In the ```init``` method, it prepares the request (setting all the desired parameters) to send to the embedded ```Mosquitto``` service to open a connection with the broker Mosquitto.
 In the ```main``` method, instead, it develops four operations:
 - **setUsername:** sets the username of the user who wants to connect to the chat.
 - **sendChatMessage:** publish the messages sent in the chat at the broker Mosquitto to the topic set in the connection. The message is converted into a json to allow the sending of additional information along with the message text.
 - **receive:** receives the messages from broker Mosquitto and saves them in a global variable ```messageQueue```.
 - **getChatMessages:** this operation reads all the messages in the queue, sends them to the WebService which prints them in the chat and empties the ```messageQueue```. This operation is called cyclically every 0.5 seconds by the web page.
 
-## Options
+#### Options
 
 In order to let you customize your communications, you can modify some options (these descriptions are taken from the official Paho library documentation):
 https://www.eclipse.org/paho/files/javadoc/org/eclipse/paho/client/mqttv3/MqttConnectOptions.html
@@ -366,7 +389,7 @@ Sets the SocketFactory to use. This allows an application to apply its own polic
     - **keyFile** - the path to the Server Key Pair file : ```string```
     - **password** - the password you used to encrypt the certificates : ```string```
 
-## SSL configuration
+#### SSL configuration
 
 So far we have seen how to implement the MQTT protocol for data transmission without worrying about communication security.
 
@@ -376,7 +399,7 @@ In particular, just add the following two jar files:
 - ```bcprov-ext-jdk15to18-166.jar```;
 to download the jars go to https://www.bouncycastle.org/latest_releases.html.
 
-##### Username and Password:
+#### Username and Password
 
 The MQTT protocol provides different degrees of security.
 The simplest is authentication with **username** and **password**. In this case the communication is not secure (the transmitted data are not encrypted) but it is a good way to limit the access to the broker only to clients who know the username and password authentication.
@@ -416,7 +439,7 @@ After performing all the above steps, in the examples (```client_server``` and `
     setMosquitto@Mosquitto (request)()
 ```
 
-##### Certified based encryption:
+#### Certified based encryption
 
 Below is a text extracted from Mosquitto's official documentation (https://mosquitto.org/man/mosquitto-conf-5.html#):
 

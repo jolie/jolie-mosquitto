@@ -14,21 +14,41 @@
    limitations under the License.
 */
 
-include "FrontendInterface.iol"
-include "mosquitto/interfaces/MosquittoInterface.iol"
-include "console.iol"
-include "json_utils.iol"
+from mosquitto.mqtt.mqtt import MQTT
+from mosquitto.mqtt.mqtt import MosquittoReceiverInterface
+from console import Console
+from json_utils import JsonUtils
 
-execution {concurrent}
-
-outputPort Mosquitto {
-    Interfaces: MosquittoPublisherInterface , MosquittoInterface
+type SendChatMessageRequest: void {
+    message: string
 }
 
-embedded {
-    Java: 
-        "org.jolielang.connector.mosquitto.MosquittoConnectorJavaService" in Mosquitto
+type GetChatMessagesResponse: void {
+    messageQueue*: void {
+        message: string
+        username: string
+        session_user: string
+    }
 }
+
+type SetUsernameRequest: void {
+    username: string
+}
+
+interface FrontendInterface {
+    RequestResponse:
+		sendChatMessage( SendChatMessageRequest )( void ),
+        getChatMessages( void )( GetChatMessagesResponse ),
+        setUsername( SetUsernameRequest )( void )
+}
+
+service Frontend {
+
+embed MQTT as Mosquitto
+embed Console as Console
+embed JsonUtils as JsonUtils
+
+execution: concurrent
 
 inputPort Frontend {
     Location: "local"
@@ -36,7 +56,6 @@ inputPort Frontend {
 }
 
 init {
-    
     request << {
         brokerURL = "tcp://mqtt.eclipseprojects.io:1883",
         subscribe << {
@@ -51,11 +70,9 @@ init {
 
     setMosquitto@Mosquitto (request)()
     println@Console("SUBSCRIBER connection done! Waiting for message on topic : "+request.subscribe.topic)()
-    
 }
 
 main {
-
     [ receive (request) ] {
         getJsonValue@JsonUtils(request.message)(jsonMessage)
         global.messageQueue[#global.messageQueue] << {
@@ -90,4 +107,6 @@ main {
         global.username = usernameRequest.username
         println@Console("Username set for the current session: "+global.username)()
     }]
+}
+
 }

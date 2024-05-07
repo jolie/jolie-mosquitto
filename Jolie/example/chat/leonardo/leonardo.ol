@@ -14,29 +14,28 @@
    limitations under the License.
 */
 
-include "console.iol"
-include "file.iol"
-include "string_utils.iol"
-include "protocols/http.iol"
+from console import Console
+from file import File
+from string-utils import StringUtils
+from protocols.http import DefaultOperationHttpRequest
+from .frontend import Frontend, SetUsernameRequest, GetChatMessagesResponse,
+    SendChatMessageRequest
 
-include "FrontendInterface.iol"
 include "config.iol"
-
-execution { concurrent }
 
 interface HTTPInterface {
 RequestResponse:
 	default(DefaultOperationHttpRequest)(undefined)
 }
 
-outputPort Frontend {
-	Interfaces: FrontendInterface
-}
+service Leonardo {
 
-embedded {
-	Jolie:
-	 "frontend.ol" in Frontend 
-}
+embed Console as Console
+embed File as File
+embed StringUtils as StringUtils
+embed Frontend as Frontend
+
+execution: concurrent
 
 inputPort HTTPInput {
 	Protocol: http {
@@ -52,8 +51,7 @@ inputPort HTTPInput {
 	Aggregates: Frontend
 }
 
-init
-{
+init {
 	if ( is_defined( args[0] ) ) {
 		documentRootDirectory = args[0]
 	} else {
@@ -61,8 +59,7 @@ init
 	}
 }
 
-main
-{
+main {
 	[ default( request )( response ) {
 		scope( scp ) {
 			install( FileNotFound => println@Console( "File not found: " + file.filename )() );
@@ -90,4 +87,6 @@ main
 			readFile@File( file )( response )
 		}
 	} ] { nullProcess }
+}
+
 }
