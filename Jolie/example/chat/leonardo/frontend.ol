@@ -75,37 +75,49 @@ init {
 main {
     [ receive (request) ] {
         getJsonValue@JsonUtils(request.message)(jsonMessage)
-        global.messageQueue[#global.messageQueue] << {
-            message = jsonMessage.message
-            username = jsonMessage.username
+        println@Console("RECEIVE ["+jsonMessage.username+"] done! Message correctly received: "+jsonMessage.message)()
+        synchronized( username ) {
             session_user = global.username
+        }
+        synchronized( messageQueue ) {
+            global.messageQueue[#global.messageQueue] << {
+                message = jsonMessage.message
+                username = jsonMessage.username
+                session_user = session_user
+            }
         }
     }
 
     [ getChatMessages( GetChatMessagesRequest )( GetChatMessagesResponse ) {
-        for (i=0, i<#global.messageQueue, i++) {
-            GetChatMessagesResponse.messageQueue[i] << global.messageQueue[i]
+        synchronized( messageQueue ) {
+            for (i=0, i<#global.messageQueue, i++) {
+                GetChatMessagesResponse.messageQueue[i] << global.messageQueue[i]
+            }
+            undef(global.messageQueue)
         }
-        undef(global.messageQueue)
     }]
 
     [ sendChatMessage( messageRequest )( response ) {
-        json << {
-            username = global.username
-            message = messageRequest.message
+        synchronized( username ) {
+            json << {
+                username = global.username
+                message = messageRequest.message
+            }
         }
         getJsonString@JsonUtils(json)(jsonString)
         req << {
             topic = "jolie/test/chat",
             message = jsonString
         }
-        println@Console("PUBLISHER ["+global.username+"] connection done! Message correctly send: "+messageRequest.message)()
         sendMessage@Mosquitto (req)()
-	}]
+        println@Console("PUBLISH ["+json.username+"] done! Message correctly sent: "+json.message)()
+    }]
 
     [ setUsername( usernameRequest )( usernameResponse ) {
-        global.username = usernameRequest.username
-        println@Console("Username set for the current session: "+global.username)()
+        synchronized( username ) {
+            global.username = usernameRequest.username
+            println@Console("Username set for the current session: "+global.username)()
+        }
     }]
 }
 
