@@ -31,7 +31,7 @@
 				callJolie("getChatMessages", { }, "Could not retrieve a message", function(data) {
 					if (typeof data.messageQueue !== 'undefined') {
 						for (let i=0; i<data.messageQueue.length; i++) {
-							const divChat = document.getElementById('textChat');
+							const divChat = document.getElementById('textChatInner');
 							if (data.messageQueue[i].username === data.messageQueue[i].session_user) {
 								divChat.innerHTML += '<div id="divMyMessage"> <b>' + data.messageQueue[i].username.toUpperCase()+'</b>   :   '+data.messageQueue[i].message +'</div>';
 							} else {
@@ -44,6 +44,8 @@
 			setInterval(getChatMessages, CHECK_MESSAGES_INTERVAL_MS)
 			
 			function sendChatMessage() {
+				window.event.preventDefault() // disable form action
+
 				const request = { "message": $("#mex").val() }
 				callJolie("sendChatMessage", request, "Could not send the message", function(data) {
 					document.getElementById("mex").value = ""
@@ -57,11 +59,13 @@
 			<h1 id="title">JOLIE CHAT using MOSQUITTO</h1>
 		</div>
 		<div id="textChat">
-			<!-- <textarea id="textChat" readonly="readonly" rows="14" cols="125"></textarea> -->
+			<span id="textChatInner"></span>
 		</div>
 		<div>
-			<input id="mex" type="text" placeholder="type your message here" size="75" maxlength="200">
-			<button onclick="sendChatMessage()">Send</button>
+			<form onsubmit="sendChatMessage()">
+				<input id="mex" type="text" placeholder="type your message here" required autofocus size="75" maxlength="200">
+				<button type="submit">Send</button>
+			</form>
 		</div>
 	</body>
 </html>

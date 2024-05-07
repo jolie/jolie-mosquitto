@@ -41,6 +41,8 @@ div {
     resize: none;
     line-height: 200%;
     overflow: auto;
+    display: flex;
+    flex-direction: column-reverse;
 }
 
 #divMyMessage {
