@@ -1,9 +1,29 @@
+/*
+   Copyright 2020 Riccardo Iattoni <riccardo.iattoni92@gmail.com>
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
+from console import Console
+from file import File
+
 include "metajolie.iol"
 include "metarender.iol"
-include "console.iol"
-include "file.iol"
-include "runtime.iol"
-include "string_utils.iol"
+
+service MosquittoTransformPort {
+
+embed Console as Console
+embed File as File
 
 init {
     if ( #args != 3 ) {
@@ -30,25 +50,24 @@ main {
 
         fileContent = ""
 
-        fileContent += resInterface+"\n"
-        fileContent += "include \"console.iol\"
-include \"mosquitto/interfaces/MosquittoInterface.iol\"
-include \"json_utils.iol\"
+        fileContent += "from mosquitto.mqtt.mqtt import MQTT
+from mosquitto.mqtt.mqtt import MosquittoReceiverInterface, MosquittoRequest
+from console import Console
+from json_utils import JsonUtils\n\n"
 
-execution {concurrent}
+        fileContent += resInterface
+
+        fileContent += "service MosquittoPluginOutput {
+
+embed MQTT as Mosquitto
+embed Console as Console
+embed JsonUtils as JsonUtils
+
+execution: concurrent
 
 inputPort Input {
     Location: \"local\"
     Interfaces: "+outputPortResponse.output[out].interfaces.name+", MosquittoReceiverInterface
-}
-
-outputPort Mosquitto {
-    Interfaces: MosquittoPublisherInterface , MosquittoInterface
-}
-
-embedded {
-    Java: 
-        \"org.jolielang.connector.mosquitto.MosquittoConnectorJavaService\" in Mosquitto
 }
 
 init {
@@ -95,14 +114,14 @@ main {\n"
         sendMessage@Mosquitto (requestMosquitto)()
 
         receive(reqReceive)
-        
+
         getJsonValue@JsonUtils(reqReceive.message)(jsonMessage)
         response << jsonMessage
     }]\n\n"
         }
     }
 
-    fileContent += "}"
+        fileContent += "}\n\n}"
 
         req << {
             filename = "mosquittoPlugin.ol"
@@ -124,12 +143,20 @@ main {\n"
 
         fileContent = ""
 
-        fileContent += resInterface+"\n"
-        fileContent += "include \"console.iol\"
-include \"mosquitto/interfaces/MosquittoInterface.iol\"
-include \"json_utils.iol\"
+        fileContent += "from mosquitto.mqtt.mqtt import MQTT
+from mosquitto.mqtt.mqtt import MosquittoReceiverInterface
+from console import Console
+from json_utils import JsonUtils\n\n"
 
-execution {concurrent}
+        fileContent += resInterface
+
+        fileContent += "service MosquittoPluginInput {
+
+embed MQTT as Mosquitto
+embed Console as Console
+embed JsonUtils as JsonUtils
+
+execution: concurrent
 
 inputPort Input {
     Location: \"local\"
@@ -140,15 +167,6 @@ outputPort Output {
     Location: \""+inputPortResponse.input[inp].location+"\"
     Protocol: sodep
     Interfaces: "+inputPortResponse.input[inp].interfaces.name+"
-}
-
-outputPort Mosquitto {
-    Interfaces: MosquittoPublisherInterface , MosquittoInterface
-}
-
-embedded {
-    Java: 
-        \"org.jolielang.connector.mosquitto.MosquittoConnectorJavaService\" in Mosquitto
 }
 
 init {
@@ -188,7 +206,7 @@ main {\n"
             }      
         }
         fileContent += "    }
-}"
+}\n\n}"
 
         req << {
             filename = "mosquittoPlugin.ol"
@@ -202,3 +220,4 @@ main {\n"
     }
 }
 
+}

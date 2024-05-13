@@ -509,7 +509,7 @@ This is an example taken from Jolie's official documentation, where a ```client.
 This request is sent to the ```calculator.ol``` service that using the principles of dynamic embedding, calculates the result of the operation and sends the response to the client.
 
 As you can see, the example has been divided into two folders ```/client``` and ```/server``` to simulate a real case.
-In both folders you need to add the ```JolieMosquittoConnector.jar``` connector and the jar of the Eclipse Paho library.
+In both folders you need to add the ```mosquitto.jap``` connector and the jar of the Eclipse Paho library in a subdir called ```/lib```.
 
 At this point, inside both folders you have to launch the file ```mqttTransformPort.ol``` passing as arguments:
 
@@ -519,8 +519,8 @@ At this point, inside both folders you have to launch the file ```mqttTransformP
 
 In this case the two calls will be:
 
-- in the /client folder: ```jolie mqttTransformPort.ol client.ol Calculator output```
-- in the /server folder: ```jolie mqttTransformPort.ol calculator.ol Calculator input```
+- in the ```/client``` folder: ```jolie ../mqttTransformPort.ol client.ol Calculator output```
+- in the ```/server``` folder: ```jolie ../mqttTransformPort.ol calculator.ol Calculator input```
 
 After these calls in both folders a ```mosquittoPlugin.ol``` file will be generated automatically.
 Each of these files will have to be embedded to its corresponding service.
