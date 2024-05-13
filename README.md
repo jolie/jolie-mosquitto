@@ -503,7 +503,7 @@ Once this process is performed on both client and server side, it will be enough
 
 The generated ```mosquittoPlugin.ol``` file has the same name but different content depending on whether it is created for the client-side service (passing as last argument ```output```), or for the server-side service (passing as last argument ```input```).
 
-Let's see now in the detail the example in the mosquitto_plugin directory.
+Let's see now in the detail the example in the ```mosquitto_plugin``` directory.
 
 This is an example taken from Jolie's official documentation, where a ```client.ol``` service requires the user to enter two operands and the operation you want to perform [sum|mul|div|sub].
 This request is sent to the ```calculator.ol``` service that using the principles of dynamic embedding, calculates the result of the operation and sends the response to the client.

@@ -7,7 +7,7 @@ include "string_utils.iol"
 
 init {
     if ( #args != 3 ) {
-      println@Console("Usage: jolie mosquitto.ol <service_filename> <port_name> <input_output>")()
+      println@Console("Usage: jolie mqttTransformPort.ol <service_filename> <port_name> <input_output>")()
     }
     service_filename = args[0]
     port_name = args[1]
