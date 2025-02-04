@@ -48,7 +48,7 @@
 
 				const request = { "message": $("#mex").val() }
 				callJolie("sendChatMessage", request, "Could not send the message", function(data) {
-					document.getElementById("mex").value = ""
+					$("#mex").val("")
 				})
 			}
 		</script>
