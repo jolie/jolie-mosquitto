@@ -25,8 +25,8 @@
 				})
 			}
 
-			function setUsername() {
-				window.event.preventDefault() // disable form action
+			function setUsername(event) {
+				event.preventDefault() // disable form action
 
 				const request = { "username": $("#nickname").val() }
 				callJolie("setUsername", request, "Could not set the username", function(data) {
@@ -41,7 +41,7 @@
 			<h1 id="title">JOLIE CHAT using MOSQUITTO</h1>
 		</div>
 		<div id="divNickname">
-			<form onsubmit="setUsername()">
+			<form onsubmit="setUsername(event)">
 				<input id="nickname" type="text" placeholder="insert your nickname" required autofocus size="40" minlength="1" maxlength="200">
 				<button type="submit">Go to the Chat</button>
 			</form>

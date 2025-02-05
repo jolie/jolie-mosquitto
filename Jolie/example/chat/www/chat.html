@@ -43,8 +43,8 @@
 			}
 			setInterval(getChatMessages, CHECK_MESSAGES_INTERVAL_MS)
 			
-			function sendChatMessage() {
-				window.event.preventDefault() // disable form action
+			function sendChatMessage(event) {
+				event.preventDefault() // disable form action
 
 				const request = { "message": $("#mex").val() }
 				callJolie("sendChatMessage", request, "Could not send the message", function(data) {
@@ -62,7 +62,7 @@
 			<span id="textChatInner"></span>
 		</div>
 		<div>
-			<form onsubmit="sendChatMessage()">
+			<form onsubmit="sendChatMessage(event)">
 				<input id="mex" type="text" placeholder="type your message here" required autofocus size="75" maxlength="200">
 				<button type="submit">Send</button>
 			</form>
